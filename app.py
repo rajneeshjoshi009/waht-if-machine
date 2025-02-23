@@ -1,12 +1,13 @@
 import google.generativeai as genai
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+import os  # Import os module
 
 app = Flask(__name__)
 CORS(app)  # Allow cross-origin requests
 
-# Set up Google AI API key
-genai.configure(api_key=" AIzaSyAcGHgZ_wVMdWqwp3mp1U6-lW2Ay4Htsn4")  # Replace with your actual key
+# Set up Google AI API key securely
+genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
 
 def what_if_chatbot(user_input):
     if not user_input.lower().startswith("what if"):
@@ -28,6 +29,11 @@ def what_if_chatbot(user_input):
     except Exception as e:
         return f"Oops! My circuits got tangled! Error: {str(e)} 🤖💥"
 
+# Root route to prevent 404 error
+@app.route('/')
+def home():
+    return "🚀 What-If API is running! Use the /what-if endpoint to send your queries."
+
 @app.route('/what-if', methods=['POST'])
 def handle_what_if():
     data = request.get_json()
@@ -36,4 +42,4 @@ def handle_what_if():
     return jsonify({'response': response})
 
 if __name__ == '__main__':
-    app.run(port=8000)
+    app.run(host="0.0.0.0", port=10000)
